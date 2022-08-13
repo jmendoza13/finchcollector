@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Predator List</h1>
+
+{% for predator in predator_list %}
+  <a href="{% url 'predators_detail' predator.id %}">
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">{{ predator.commonName }}</span>
+            <p>Description: {{ predator.description }}</p>
+        </div>
+    </div>
+  </a>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Finch Details</h1>
+
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">{{ finch.commonName }}</span>
+        <p>Species: {{ finch.species }}</p>
+        <p>Description: {{ finch.description|linebreaks }}</p>
+        <p>IOC Sequence: {{ finch.iocSequence }}</p>
+      </div>
+      <div class="card-action">
+        <a href="{% url 'finches_update' finch.id %}">Edit</a>
+        <a href="{% url 'finches_delete' finch.id %}">Delete</a>
+      </div>
+    </div>
+  </div>
+  <div class="col s6">
+    <form action="{% url 'add_sighting' finch.id %}" method="POST">
+      {% csrf_token %}
+      {{ sighting_form.as_p }}
+      <input type="submit" class="btn" value="Add Sighting">
+    </form>
+    <br>
+    <table class="striped">
+      <thead>
+        <tr><th>Date</th><th>Location</th></tr>
+      </thead>
+      <tbody>
+        {% for sighting in finch.sighting_set.all %}
+        <tr>
+          <td>{{sighting.date}}</td>
+          <td>{{sighting.location}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col s6">
+      <h3>{{ finch.commonName }}'s Predators</h3>
+      {% if finch.predators.count %}
+        {% for predator in finch.predators.all %}
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">{{ predator.commonName }}</span>
+              <p>Description: {{ predator.description }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <h5>No Predators :)</h5>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="col s6">
+  <h3>Predator List</h3>
+  {% if predators.count %}
+    {% for predator in predators.all %}
+      <div class="card">
+        <div class="card-content">
+          <span class="card-title">
+            <a href="{% url 'predators_detail' predator.id %}">{{ predator.commonName }}</a>
+          </span>
+        </div>
+        <div class="card-action">
+          <form action="{% url 'assoc_predator' finch.id predator.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn">Add</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h5>{{finch.commonName}} is prey to all listed predators :(</h5>
+  {% endif %}
+</div>
+
+<script>
+  const dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+  format: 'yyyy-mm-dd',
+  defaultDate: new Date(),
+  setDefaultDate: true,
+  autoClose: true
+  });  
+</script>
+{% endblock %}
